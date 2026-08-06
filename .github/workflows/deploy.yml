@@ -1,3 +1,4 @@
+cat > .github/workflows/deploy.yml << 'EOF'
 name: Build, Push, and Deploy
 
 on:
@@ -28,22 +29,20 @@ jobs:
       - name: Build and push backend image
         uses: docker/build-push-action@v6
         with:
-          context: ./Expense_Tracker
-          file: ./Expense_Tracker/backend/Dockerfile
+          context: .
+          file: ./backend/Dockerfile
           push: true
           tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
 
       - name: Fetch secrets from Vault
-        working-directory: Expense_Tracker
         run: bash vault.sh
 
       - name: Deploy with Docker Compose
-        working-directory: Expense_Tracker
         run: |
           docker compose pull
           docker compose down
           docker compose up -d
 
       - name: Verify containers are running
-        working-directory: Expense_Tracker
         run: docker compose ps
+EOF
