@@ -1,0 +1,27 @@
+cat > docker-compose.yml << 'EOF'
+services:
+  db:
+    image: postgres:16
+    container_name: expense_db
+    restart: unless-stopped
+    env_file:
+      - ./backend/.env
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  backend:
+    image: ghcr.io/nsourahmad/project2:latest
+    container_name: expense_backend
+    restart: unless-stopped
+    env_file:
+      - ./backend/.env
+    depends_on:
+      - db
+    ports:
+      - "8000:8000"
+
+volumes:
+  db_data:
+EOF
